@@ -1,0 +1,79 @@
+# accounts: 下のエリアの説明です。口座番号、ログインパスワード、支店コード、取引パスワードを入力します
+#   kouzabangou: 111111
+#   loginpassword: password1
+#   shitencode: 000
+#   torihikipassword: password2
+accounts:
+  kouzabangou: 
+  loginpassword: 
+  shitencode: 
+  torihikipassword: 
+
+# ターゲット銘柄の説明です
+# issues:
+# - limit_ordered_number: null    <= nullがデフォルト値です。指値注文がされると更新されます。
+#   limit_ordered_status: null　　<= nullがデフォルト値です。指値注文がされると更新されます。
+#   market_ordered_number: null　　<= nullがデフォルト値です。成行注文がされると更新されます。
+#   market_ordered_status: null　　<= nullがデフォルト値です。成行注文がされると更新されます。
+#   name: DCMホールディングス　　　　<= 銘柄の名前です
+#   number: 3050　　　　　　　　　　<= 銘柄の番号です
+#   order_quantity: 100　　　　　　<= 注文数量です
+#   order_type: '指値'　　　　　　<= '指値'もしくは'成行'を入れます
+issues:
+- limit_ordered_number: null
+  limit_ordered_status: null
+  market_ordered_number: null
+  market_ordered_status: null
+  name: DCMホールディングス
+  number: 3050
+  order_quantity: 100
+  order_type: '指値'
+- limit_ordered_number: null
+  limit_ordered_status: null
+  market_ordered_number: null
+  market_ordered_status: null
+  name: 大庄
+  number: 9979
+  order_quantity: 100
+  order_type: '指値'
+- limit_ordered_number: null
+  limit_ordered_status: null
+  market_ordered_number: null
+  market_ordered_status: null
+  name: フジ
+  number: 8278
+  order_quantity: 100
+  order_type: '指値'
+- limit_ordered_number: null
+  limit_ordered_status: null
+  market_ordered_number: null
+  market_ordered_status: null
+  name: アレンザホールディングス
+  number: 3546
+  order_quantity: 100
+  order_type: '指値'
+- limit_ordered_number: null
+  limit_ordered_status: null
+  market_ordered_number: null
+  market_ordered_status: null
+  name: ヒマラヤ
+  number: 7514
+  order_quantity: 100
+  order_type: '指値'
+- limit_ordered_number: null
+  limit_ordered_status: null
+  market_ordered_number: null
+  market_ordered_status: null
+  name: リンガーハット
+  number: 8200
+  order_quantity: 100
+  order_type: '指値'
+- limit_ordered_number: null
+  limit_ordered_status: null
+  market_ordered_number: null
+  market_ordered_status: null
+  name: スギホールディングス
+  number: 7649
+  order_quantity: 100
+  order_type: '指値'
+
