@@ -11,6 +11,7 @@ packages = [{include = "nikko_survey"}]
 python = "^3.10"
 pytest-playwright = "^0.3.0"
 pyyaml = "^6.0"
+keyboard = "^0.13.5"
 
 
 [build-system]

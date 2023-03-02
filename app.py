@@ -23,6 +23,8 @@ class Issue:
         self.market_ordered_status = issue["market_ordered_status"]
         self.limit_ordered_number = issue["limit_ordered_number"]
         self.market_ordered_number = issue["market_ordered_number"]
+        self.order_type = issue["order_type"]
+        self.order_period = issue["order_period"]
 
 
 class Account:
@@ -40,21 +42,26 @@ def data_update_save(data, issues):
     # YAMLファイルから読み込んだデータと、Issueオブジェクトのリストを受け取り、
     # Issueオブジェクトの各属性を使って、YAMLファイルのデータを更新します。
     # 最後に、更新されたデータをYAMLファイルに書き込みます。
-    for i in range(0, len(issues)):
+    try:
+        for i in range(0, len(issues)):
 
-        # 値を更新する
-        # data['issues'][i]['order_quantity'] = issues.order_quantity
-        data["issues"][i]["limit_ordered_status"] = issues[i].limit_ordered_status
-        data["issues"][i]["market_ordered_status"] = issues[i].market_ordered_status
-        data["issues"][i]["limit_ordered_number"] = issues[i].limit_ordered_number
-        data["issues"][i]["market_ordered_number"] = issues[i].market_ordered_number
-        data["issues"][i]["name"] = issues[i].name
+            # 値を更新する
+            # data['issues'][i]['order_quantity'] = issues.order_quantity
+            data["issues"][i]["limit_ordered_status"] = issues[i].limit_ordered_status
+            data["issues"][i]["market_ordered_status"] = issues[i].market_ordered_status
+            data["issues"][i]["limit_ordered_number"] = issues[i].limit_ordered_number
+            data["issues"][i]["market_ordered_number"] = issues[i].market_ordered_number
+            data["issues"][i]["name"] = issues[i].name
 
-    # YAMLファイルに書き込む
-    with open("config.yaml", "w", encoding="utf-8") as f:
-        # with open('config.yaml', 'w', encoding='cp932') as f:
-        yaml.dump(data, f, allow_unicode=True)
+        # YAMLファイルに書き込む
+        with open("config.yaml", "w", encoding="utf-8") as f:
+            # with open('config.yaml', 'w', encoding='cp932') as f:
+            yaml.dump(data, f, allow_unicode=True)
+    except:
+        print('data_update_saveが失敗しました')
+        return False
 
+    return True
 
 def is_within_timeframe(*timeframes) -> bool:
     """
@@ -115,9 +122,9 @@ def thursday_night_function() -> True:
         # 現在の時刻が範囲内にあるかどうかを判定する
         if start_time <= datetime.datetime.now().time() <= end_time:
             # 実行する処理
-            print("木曜の夜18時00分から23時59分の範囲内です: Trueを返します")
+            print("木曜の夜18時00分から23時59分の範囲内です: 指値の成行注文変更を試みます")
             return True
-    print("木曜の夜18時00分から23時59分ではありません: Falseを返します")
+    print("木曜の夜18時00分から23時59分ではありません: 指値の成行注文変更は行いません")
     return False
 
 
@@ -140,7 +147,10 @@ def run(playwright: Playwright, data) -> None:
     def nikko_login(page, account):
 
         try:
-            page.goto("https://trade.smbcnikko.co.jp/Etc/1/webtoppage/")
+            page.goto("https://trade.smbcnikko.co.jp/Etc/1/webtoppage/", wait_until='load')
+
+            # 5秒待機する
+            page.wait_for_timeout(5000)
             page.locator("#padInput0").click()
             page.locator("#padInput0").fill(str(account.shitencode))
             page.locator("#padInput1").click()
@@ -295,7 +305,7 @@ def run(playwright: Playwright, data) -> None:
                                     issue.limit_ordered_status = order_status
         return issues
 
-    def place_limit_order(page, suryou: int, account, order_type: str):
+    def place_limit_order(page, suryou: int, account, order_type: str, order_period:str):
         # TODO: 指値注文を入れる
         element = page.locator('a:has-text("一般新規売")')
         if element.is_visible():
@@ -327,7 +337,7 @@ def run(playwright: Playwright, data) -> None:
 
         if order_type == "成行":
             page.get_by_label("成行").check()
-            page.get_by_text("今週中", exact=True).click()
+
 
         elif order_type == "指値":
 
@@ -348,8 +358,9 @@ def run(playwright: Playwright, data) -> None:
             return False
 
         page.get_by_text("特定口座").click()
-        page.get_by_label("今週中").check()
-
+        print(dt.now().isoformat() + "  :  " + "特定口座")
+        page.get_by_label(order_period).check()
+        print(dt.now().isoformat() + "  :  " + f"{order_period}")
         # 同意 出ていればチェックをする
         try:
             chk_element = page.get_by_label(
@@ -477,19 +488,21 @@ def run(playwright: Playwright, data) -> None:
             # 注文状況を取得する
             for issue in issues:
                 # 注文訂正するべきorder_statusの場合
-                # if order_status in active_order_statuses:
-                if True:
-                    # order_numberが指値にあり、成行に無い場合、注文の訂正を行う
-                    if str(issue.number) == issue_number:
-                        if order_type == "指値":
-                            if issue.market_ordered_number is None:
-                                print("指値注文の成行注文への訂正処理を行います")
-                                tbl.nth(i).get_by_role(
-                                    "link", name="訂正", exact=True
-                                ).click()
-                                place_market_order(account)
-                            else:
-                                print("既に成行注文が存在するため、指値の変更を行いません")
+                if order_status in active_order_statuses:
+                    if True:
+                        # order_numberが指値にあり、成行に無い場合、注文の訂正を行う
+                        if str(issue.number) == issue_number:
+                            if order_type == "指値":
+                                if issue.market_ordered_number is None:
+                                    print(issue.name + " : 指値注文の成行注文への訂正処理を行います")
+                                    tbl.nth(i).get_by_role(
+                                        "link", name="訂正", exact=True
+                                    ).click()
+                                    place_market_order(account)
+                                else:
+                                    print(issue.name + " : 既に成行注文が存在するため、指値の変更を行いません")
+                    
+                
 
     def place_market_order(account):
         ######################################
@@ -526,7 +539,7 @@ def run(playwright: Playwright, data) -> None:
         print("処理を開始します")
     else:
         print("処理を中断します")
-        exit()
+        return()
 
     issues = []
     for issue in data.get("issues"):
@@ -535,14 +548,23 @@ def run(playwright: Playwright, data) -> None:
     account = Account(data.get("accounts"))
 
     # ログインする
-    nikko_login(page, account)
+    res = nikko_login(page, account)
+
+    if res == False:
+        print("ログインできませんでした")
+        print("処理を中断します")
+        return()
 
     # オーダー状況の確認を行う
     issues = check_ordered(page, issues)
     # オーダーデータをアップデートして保存する
-    data_update_save(data, issues)
+    if issues:
+        res = data_update_save(data, issues)
+        if res == False:
+            print("処理を中断します")
+            return()
     for issue in issues:
-        print(dt.now().isoformat() + "  :  " + issue.name + "をチェック中")
+        print(dt.now().isoformat() + "  :  " + issue.name + " " + str(issue.number) + "をチェック中")
         # issue_number = issue['number']
 
         if check_availability(page, str(issue.number)):
@@ -550,28 +572,44 @@ def run(playwright: Playwright, data) -> None:
             if issue.limit_ordered_status:
                 print("既に指値注文が存在するため、注文しません。")
             else:
-                res = place_limit_order(page, issue.order_quantity, account)
+                res = place_limit_order(page, issue.order_quantity, account,issue.order_type, issue.order_period)
                 # オーダー状況の確認を行う
                 issues = check_ordered(page, issues)
         else:
             print("------------------------")
             # 次の銘柄へ
             continue
+    if issues:
+        res = data_update_save(data, issues)
+        if res == False:
+            print("処理を中断します")
+            return()
 
-    data_update_save(data, issues)
 
     # 木曜の夜18時00分から23時59分までのみ実行
     if thursday_night_function():
         # 成行=>指値
-        place_market_order(account)
+        change_orders_to_market(account)
 
     page.close()
-
-    # ---------------------
     context.close()
     browser.close()
-    exit()
+
+    # ---------------------
+    # exit()
+
+import time
+import keyboard
+
+def my_function():
+    with sync_playwright() as playwright:
+        while True:
+            run(playwright, data)
+            print("ターミナルをクリックし、Ctrl + c で終了します")
+            for i in range(0,30):
+                time.sleep(1)  # 5分間待つ
+
+my_function()
 
 
-with sync_playwright() as playwright:
-    run(playwright, data)
+

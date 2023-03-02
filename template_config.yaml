@@ -19,6 +19,7 @@ accounts:
 #   number: 3050　　　　　　　　　　<= 銘柄の番号です
 #   order_quantity: 100　　　　　　<= 注文数量です
 #   order_type: '指値'　　　　　　<= '指値'もしくは'成行'を入れます
+  # order_period: 今週中　　　　　<= '今週中'もしくは'当日中'を入れます
 issues:
 - limit_ordered_number: null
   limit_ordered_status: null
@@ -28,6 +29,7 @@ issues:
   number: 3050
   order_quantity: 100
   order_type: '指値'
+  order_period: 今週中
 - limit_ordered_number: null
   limit_ordered_status: null
   market_ordered_number: null
@@ -36,6 +38,7 @@ issues:
   number: 9979
   order_quantity: 100
   order_type: '指値'
+  order_period: 今週中
 - limit_ordered_number: null
   limit_ordered_status: null
   market_ordered_number: null
@@ -44,6 +47,7 @@ issues:
   number: 8278
   order_quantity: 100
   order_type: '指値'
+  order_period: 今週中
 - limit_ordered_number: null
   limit_ordered_status: null
   market_ordered_number: null
@@ -52,6 +56,7 @@ issues:
   number: 3546
   order_quantity: 100
   order_type: '指値'
+  order_period: 今週中
 - limit_ordered_number: null
   limit_ordered_status: null
   market_ordered_number: null
@@ -60,6 +65,7 @@ issues:
   number: 7514
   order_quantity: 100
   order_type: '指値'
+  order_period: 今週中
 - limit_ordered_number: null
   limit_ordered_status: null
   market_ordered_number: null
@@ -68,6 +74,7 @@ issues:
   number: 8200
   order_quantity: 100
   order_type: '指値'
+  order_period: 今週中
 - limit_ordered_number: null
   limit_ordered_status: null
   market_ordered_number: null
@@ -76,4 +83,5 @@ issues:
   number: 7649
   order_quantity: 100
   order_type: '指値'
+  order_period: 今週中
 
